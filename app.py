@@ -44,24 +44,26 @@ def check_password(username, password):
         return hashed == users[username]["password"]
     return False
 
-# ---------- LOGIN ----------
+# ---------- SESSION STATE ----------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "username" not in st.session_state:
     st.session_state.username = ""
+if "seleccionado" not in st.session_state:
+    st.session_state.seleccionado = None
 
+# ---------- LOGIN ----------
 if not st.session_state.logged_in:
     st.title("🔒 Login")
 
-    username = st.text_input("Usuario")
-    password = st.text_input("Contraseña", type="password")
+    username_input = st.text_input("Usuario")
+    password_input = st.text_input("Contraseña", type="password")
 
     if st.button("Ingresar"):
-        if check_password(username, password):
+        if check_password(username_input, password_input):
             st.session_state.logged_in = True
-            st.session_state.username = username
-            st.success(f"Bienvenido, {username}!")
-            st.experimental_rerun()  # recarga la app para mostrar la interfaz
+            st.session_state.username = username_input
+            st.success(f"Bienvenido, {username_input}!")
         else:
             st.error("Usuario o contraseña incorrectos ❌")
 else:
@@ -79,11 +81,8 @@ else:
         save_users(users)
         st.success("Lista guardada ✅")
 
-    # ---------- Selección aleatoria con interfaz gráfica ----------
+    # ---------- Selección aleatoria ----------
     st.markdown("### 🎯 Selección de alumno")
-    if "seleccionado" not in st.session_state:
-        st.session_state.seleccionado = None
-
     if st.button("Seleccionar alumno"):
         if alumnos:
             st.session_state.seleccionado = random.choice(alumnos)
@@ -95,7 +94,7 @@ else:
         </div>
     """, unsafe_allow_html=True)
 
-    # ---------- Mostrar todos los alumnos en recuadros ----------
+    # ---------- Mostrar todos los alumnos ----------
     st.markdown("### 👩‍🎓 Lista de alumnos")
     for est in alumnos:
         st.markdown(f"""
