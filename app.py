@@ -88,9 +88,25 @@ else:
             st.session_state.seleccionado = random.choice(alumnos)
 
     elegido = st.session_state.seleccionado or "ninguno"
+    # Recuadro de alumno elegido cuadrado y centrado
     st.markdown(f"""
-        <div style='border: 2px solid #4CAF50; border-radius: 10px; padding: 20px; margin-top: 10px; background-color:#f0f0f0; text-align:center; font-size:20px;'>
-            Estudiante elegido: <strong>{elegido}</strong>
+        <div style='
+            width: 150px;
+            height: 150px;
+            background-color: #f0f0f0;
+            color: black;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px auto;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        '>
+            Estudiante elegido:<br><strong>{elegido}</strong>
         </div>
     """, unsafe_allow_html=True)
 
