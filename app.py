@@ -96,12 +96,30 @@ else:
 
     # ---------- Mostrar todos los alumnos ----------
     st.markdown("### 👩‍🎓 Lista de alumnos")
-    for est in alumnos:
-        st.markdown(f"""
-            <div style='border: 1px solid #888; border-radius: 5px; padding: 10px; margin: 5px; background-color:#fafafa;'>
-                {est}
-            </div>
-        """, unsafe_allow_html=True)
+    cols_per_row = 3  # cantidad de recuadros por fila
+    for i in range(0, len(alumnos), cols_per_row):
+        cols = st.columns(cols_per_row)
+        for j, est in enumerate(alumnos[i:i+cols_per_row]):
+            with cols[j]:
+                st.markdown(f"""
+                    <div style="
+                        background-color: white;
+                        color: black;
+                        width: 150px;
+                        height: 150px;
+                        border-radius: 10px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        text-align: center;
+                        padding: 10px;
+                        margin: 5px auto;
+                        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+                        font-weight: bold;
+                    ">
+                        {est}
+                    </div>
+                """, unsafe_allow_html=True)
 
     # ---------- Guardar resultados en Excel ----------
     if "EXCEL_FILE" not in st.session_state:
