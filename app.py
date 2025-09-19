@@ -5,7 +5,7 @@ from datetime import datetime
 import random
 
 # ---------- CONFIG ----------
-SPREADSHEET_NAME = "seleccion aleatoria - prueba"  # nombre de tu Google Sheet
+SPREADSHEET_ID = "12BC_5JMZay0ntdmDMUx2eYAQFt-r1d6SoPBIPJOh2EQ"  # tu ID de hoja
 
 # ---------- Autenticación usando Streamlit Secrets ----------
 creds = Credentials.from_service_account_info(
@@ -16,7 +16,7 @@ creds = Credentials.from_service_account_info(
     ]
 )
 client = gspread.authorize(creds)
-sheet = client.open(SPREADSHEET_NAME).sheet1
+sheet = client.open_by_key(SPREADSHEET_ID).sheet1  # abrimos por ID
 
 # ---------- SESSION STATE ----------
 if "logged_in" not in st.session_state:
@@ -32,7 +32,6 @@ if not st.session_state.logged_in:
     username_input = st.text_input("Usuario")
     password_input = st.text_input("Contraseña", type="password")
     if st.button("Ingresar"):
-        # Aquí ponés tu validación de contraseña
         if username_input == "admin" and password_input == "1234":
             st.session_state.logged_in = True
             st.session_state.username = username_input
@@ -42,12 +41,11 @@ if not st.session_state.logged_in:
 else:
     st.title(f"👋 Bienvenido, {st.session_state.username}")
 
-    # ---------- Leer alumnos de la hoja ----------
+    # ---------- Leer alumnos ----------
     alumnos = sheet.col_values(1)[1:]  # saltamos el encabezado
     alumnos_text = "\n".join(alumnos)
     new_alumnos = st.text_area("Lista de alumnos (uno por línea)", alumnos_text).splitlines()
     if st.button("Guardar lista"):
-        # Borro lista anterior y escribo nueva
         sheet.resize(len(new_alumnos)+1, 1)
         sheet.update("A2:A", [[a] for a in new_alumnos])
         st.success("Lista guardada ✅")
@@ -69,7 +67,6 @@ else:
         except ValueError:
             col_fecha = len(sheet.row_values(1)) + 1
             sheet.update_cell(1, col_fecha, fecha)
-        # Buscar fila del alumno
         alumnos_list = sheet.col_values(1)
         fila = alumnos_list.index(st.session_state.seleccionado) + 1
         sheet.update_cell(fila, col_fecha, valor)
