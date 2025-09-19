@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st 
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
@@ -119,7 +119,15 @@ if st.session_state.logged_in:
             
             alumnos_list = sheet.col_values(1)
             fila = alumnos_list.index(st.session_state.seleccionado) + 1
-            sheet.update_cell(fila, col_fecha, valor)
+            
+            # Leer valor actual y concatenar
+            valor_actual = sheet.cell(fila, col_fecha).value
+            if valor_actual:
+                nuevo_valor = f"{valor_actual} {valor}"
+            else:
+                nuevo_valor = valor
+
+            sheet.update_cell(fila, col_fecha, nuevo_valor)
 
         col1, col2 = st.columns(2)
         with col1:
