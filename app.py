@@ -78,15 +78,23 @@ else:
     # ---------- Guardar asistencia ----------
     def guardar_resultado(valor):
         fecha = datetime.today().strftime("%Y-%m-%d")
+        row1 = sheet.row_values(1)
+        
+        # Buscar columna de la fecha
         try:
-            col_fecha = sheet.row_values(1).index(fecha) + 1
+            col_fecha = row1.index(fecha) + 1
         except ValueError:
-            col_fecha = len(sheet.row_values(1)) + 1
+            col_fecha = len(row1) + 1
+            # Redimensionar hoja para asegurarnos de que la columna exista
+            sheet.resize(rows=len(sheet.get_all_values()), cols=col_fecha)
             sheet.update_cell(1, col_fecha, fecha)
+        
+        # Buscar fila del alumno
         alumnos_list = sheet.col_values(1)
         fila = alumnos_list.index(st.session_state.seleccionado) + 1
         sheet.update_cell(fila, col_fecha, valor)
 
+    # ---------- Botones de asistencia ----------
     col1, col2 = st.columns(2)
     with col1:
         if st.button("✅ Entregado") and st.session_state.seleccionado:
