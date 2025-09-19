@@ -1,137 +1,117 @@
 import streamlit as st
+import gspread
+from google.oauth2.service_account import Credentials
+from datetime import datetime
+import random
 import json
 import os
-import hashlib
-from datetime import datetime
-from openpyxl import Workbook, load_workbook
 
 # ---------- CONFIG ----------
 USERS_FILE = "users.json"
-DATA_FOLDER = "data"
 
-if not os.path.exists(DATA_FOLDER):
-    os.makedirs(DATA_FOLDER)
+# Inicializar JSON de usuarios si no existe
+if not os.path.exists(USERS_FILE):
+    default_users = {
+        "admin": {
+            "password": "1234",  # o hash si querés
+            "sheet_id": "12BC_5JMZay0ntdmDMUx2eYAQFt-r1d6SoPBIPJOh2EQ"  # hoja por defecto
+        }
+    }
+    with open(USERS_FILE, "w") as f:
+        json.dump(default_users, f, indent=4)
 
-
-# ---------- FUNCIONES ----------
 def load_users():
-    if not os.path.exists(USERS_FILE):
-        with open(USERS_FILE, "w") as f:
-            json.dump({}, f)
     with open(USERS_FILE, "r") as f:
         return json.load(f)
 
+# ---------- LOGIN ----------
+st.title("🔒 Login")
+users = load_users()
 
-def save_users(users):
-    with open(USERS_FILE, "w") as f:
-        json.dump(users, f, indent=4)
+username_input = st.text_input("Usuario")
+password_input = st.text_input("Contraseña", type="password")
 
+if st.button("Ingresar"):
+    if username_input in users and users[username_input]["password"] == password_input:
+        st.session_state.logged_in = True
+        st.session_state.username = username_input
+        st.session_state.sheet_id = users[username_input]["sheet_id"]
+        st.success(f"Bienvenido, {username_input}!")
+    else:
+        st.error("Usuario o contraseña incorrectos ❌")
 
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+# ---------- SESIÓN INICIADA ----------
+if st.session_state.get("logged_in"):
 
+    # ---------- Autenticación Google Sheets ----------
+    creds = Credentials.from_service_account_info(
+        st.secrets["google_service_account"],
+        scopes=[
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+    )
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key(st.session_state.sheet_id).sheet1
 
-def login(username, password):
-    users = load_users()
-    if username in users and users[username]["password"] == hash_password(password):
-        return True
-    return False
+    # ---------- Leer alumnos ----------
+    alumnos = sheet.col_values(1)[1:]  # saltamos encabezado
+    alumnos_text = "\n".join(alumnos)
+    new_alumnos = st.text_area("Lista de alumnos (uno por línea)", alumnos_text).splitlines()
+    if st.button("Guardar lista"):
+        sheet.resize(len(new_alumnos)+1, 1)
+        sheet.update("A2:A", [[a] for a in new_alumnos])
+        st.success("Lista guardada ✅")
 
+    # ---------- Selección aleatoria ----------
+    st.markdown("### 🎯 Selección de alumno")
+    if "seleccionado" not in st.session_state:
+        st.session_state.seleccionado = None
 
-def create_user(username, password, sheet_id="default.xlsx"):
-    users = load_users()
-    if username in users:
-        return False
-    users[username] = {
-        "password": hash_password(password),
-        "sheet_id": sheet_id,
-    }
-    save_users(users)
-    return True
+    if st.button("Seleccionar alumno"):
+        if new_alumnos:
+            st.session_state.seleccionado = random.choice(new_alumnos)
 
+    elegido = st.session_state.seleccionado or "ninguno"
+    st.markdown(f"""
+        <div style='border: 2px solid #4CAF50; border-radius: 10px; padding: 20px; margin-top: 10px; 
+                    background-color:#f0f0f0; text-align:center; font-size:20px; color:#000000;'>
+            Estudiante elegido: <strong>{elegido}</strong>
+        </div>
+    """, unsafe_allow_html=True)
 
-def get_user_file(username):
-    users = load_users()
-    sheet_id = users[username]["sheet_id"]
-    return os.path.join(DATA_FOLDER, sheet_id)
+    # ---------- Mostrar todos los alumnos en recuadros ----------
+    st.markdown("### 👩‍🎓 Lista de alumnos")
+    for est in new_alumnos:
+        st.markdown(f"""
+            <div style='border: 1px solid #888; border-radius: 5px; padding: 10px; margin: 5px; 
+                        background-color:#ffffff; color:#000000;'>
+                {est}
+            </div>
+        """, unsafe_allow_html=True)
 
+    # ---------- Guardar asistencia ----------
+    def guardar_resultado(valor):
+        fecha = datetime.today().strftime("%Y-%m-%d")
+        row1 = sheet.row_values(1)
+        
+        try:
+            col_fecha = row1.index(fecha) + 1
+        except ValueError:
+            col_fecha = len(row1) + 1
+            sheet.resize(rows=len(sheet.get_all_values()), cols=col_fecha)
+            sheet.update_cell(1, col_fecha, fecha)
+        
+        alumnos_list = sheet.col_values(1)
+        fila = alumnos_list.index(st.session_state.seleccionado) + 1
+        sheet.update_cell(fila, col_fecha, valor)
 
-def save_list_to_excel(username, students, results):
-    file_path = get_user_file(username)
-
-    # Si no existe el archivo, crear nuevo
-    if not os.path.exists(file_path):
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Asistencia"
-
-        # Encabezado inicial (columna A = nombres, fila 1 = fechas)
-        ws["A1"] = "Alumno"
-        for i, student in enumerate(students, start=2):
-            ws.cell(row=i, column=1, value=student)
-
-        wb.save(file_path)
-
-    # Abrir archivo existente
-    wb = load_workbook(file_path)
-    ws = wb.active
-
-    # Crear nueva columna con fecha actual
-    current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
-    col = ws.max_column + 1
-    ws.cell(row=1, column=col, value=current_date)
-
-    # Guardar E/X en la columna nueva
-    for i, result in enumerate(results, start=2):
-        ws.cell(row=i, column=col, value=result)
-
-    wb.save(file_path)
-
-
-# ---------- INTERFAZ ----------
-st.title("📋 Sistema de Asistencia")
-
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.username = ""
-
-if not st.session_state.logged_in:
-    st.subheader("🔑 Iniciar sesión")
-    username = st.text_input("Usuario")
-    password = st.text_input("Contraseña", type="password")
-
-    if st.button("Ingresar"):
-        if login(username, password):
-            st.session_state.logged_in = True
-            st.session_state.username = username
-            st.success("✅ Sesión iniciada")
-        else:
-            st.error("❌ Usuario o contraseña incorrectos")
-
-    st.subheader("🆕 Crear usuario")
-    new_user = st.text_input("Nuevo usuario")
-    new_pass = st.text_input("Nueva contraseña", type="password")
-    new_file = st.text_input("Nombre de archivo Excel (ej: curso1.xlsx)", "default.xlsx")
-
-    if st.button("Crear usuario"):
-        if create_user(new_user, new_pass, new_file):
-            st.success("✅ Usuario creado correctamente")
-        else:
-            st.error("⚠️ El usuario ya existe")
-
-else:
-    st.success(f"Sesión iniciada como **{st.session_state.username}**")
-
-    st.subheader("✍️ Ingresar lista de alumnos")
-    alumnos_input = st.text_area("Ingrese los nombres separados por coma:", "Juan, Pedro, Maria")
-    alumnos = [a.strip() for a in alumnos_input.split(",") if a.strip()]
-
-    if alumnos:
-        resultados = []
-        for alumno in alumnos:
-            opcion = st.radio(f"{alumno}", ["E", "X"], horizontal=True)
-            resultados.append(opcion)
-
-        if st.button("💾 Guardar lista en Excel"):
-            save_list_to_excel(st.session_state.username, alumnos, resultados)
-            st.success("✅ Lista guardada en el archivo Excel")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✅ Entregado") and st.session_state.seleccionado:
+            guardar_resultado("E")
+            st.success("Guardado como ENTREGADO ✅")
+    with col2:
+        if st.button("❌ No entregado") and st.session_state.seleccionado:
+            guardar_resultado("X")
+            st.error("Guardado como NO ENTREGADO ❌")
