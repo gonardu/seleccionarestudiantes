@@ -1,16 +1,20 @@
 import streamlit as st
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 from datetime import datetime
 import random
 
 # ---------- CONFIG ----------
-SCOPE = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
-CREDENTIALS_FILE = "streamlitasistencia-e6d8319eeb78.json"  # tu JSON descargado
-SPREADSHEET_NAME = "seleccion aleatoria - prueba"           # nombre de tu Google Sheet
+SPREADSHEET_NAME = "seleccion aleatoria - prueba"  # nombre de tu Google Sheet
 
-# ---------- Autenticación ----------
-creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, SCOPE)
+# ---------- Autenticación usando Streamlit Secrets ----------
+creds = Credentials.from_service_account_info(
+    st.secrets["google_service_account"],
+    scopes=[
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+)
 client = gspread.authorize(creds)
 sheet = client.open(SPREADSHEET_NAME).sheet1
 
