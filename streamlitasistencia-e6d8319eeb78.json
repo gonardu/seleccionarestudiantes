@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "streamlitasistencia",
+  "private_key_id": "e6d8319eeb78f56f83f3dc8fc296bd27ca592981",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC+tsETx8jPu/ut\niguEJtA9UNrN7vHHNJ5TGRF3BCyMB/VzPpkTJ0Nv9AE+m/vFHqkj+01uLLwTRh35\nLDO3kKbw7BKimesa5gtnOmdyHs7F3K/JL8+Zo+9Lli3GLd6ZaReU1A7IlrtCNite\nSuGMXnmO+//9wCjcHcVoV8lB2TcmhEblw2PF0yxkbLQwXIQwH18oi2Nlca1n/e3+\n3pfjo0pFAYAesJZylEHdrLOnqddUq/rBrzHsveWJTiGZSGzE5OF1fzppN3+AnoMJ\n88O10EbGohH8y3P4S1dqijJGWbHUhr5wOXc3CYlu5goA7jlyrcCH2I3fOdzVBvGI\nzTizrAklAgMBAAECggEAMWYmIekEZ2aSXNOegwcItnEsk936K3bCMdUS9IiUv1rK\nZaUHwnHPon6KGf0OXHNCLYtI9apJtxZY6jNcXAZwb4Q+mXaT8t42gvEaXXGEbrTo\npYyoUewoLiSCy8wS1hrmHEtHXwbID3D3j8+Gl7Ta+MHmf4RYMRfXC919SHyqr+Nt\n+nBoXBo17mlRG0chP19Tqc0YnKcIZh6FVhoxG5hnwvGtzvc9PGk7zu2K+JshdEKz\nYAemogUacQv8hbHv7vBLxsqbWmjuJCX2yNAKRjsKb6+EaBiDKrf/dWU2HZaufSIV\nKtdNvCMinycp03fU+NVIFglJitECS3iaAMrNLMxTqwKBgQDhUebOVrHJu637bZr5\nfDuTQzaGiGyspF7yEPZrNK5LxMVDBM4ZqYB+owfcLzwXIhBU5jyz70a+KpsFBN7l\nQm4gHH3gaswnMSNZLG+vGu0pkF86KZp552IOkxIvQ0G14L8Ziw7SNLZemeE5gIOf\nQJTZyr1htlTam4oo7u7oEJh3EwKBgQDYrpIv1CV+jH7RTY3Mzuus7vqo4mx6OmtZ\nVDKrWSYAJZ/q149I84l2isELOYLXC98KdMVXn2G/XVYA1Cp30fcSjh7qL7LEBaze\nvMGOGPLF0wJVp8pq40R5V6S3ySZTGwiRpWBSmi41YGlhJRIzdPfafvvTjWfcavu/\nSGnqjDTt5wKBgBfQv1OJ6ErJUo9ju2CpV+at0QKRQuNQkFSHpHQaYl3R04PM6zfd\nKZ64/qiwOWq8h/thRoNCRDjvaeky5ZhX2Cn+uPNSdneiAvl27+sTLoQZJWeRZCmE\nYmHl+6MROc3OjoRVpWBkf+4p15trUP4xJkqK2k+MpRViIU1IS+otbuAPAoGADk2H\nrMyOJQpVHK/H2msWN3YW6ar4iiDtERpztcfOsFfLdI8CEEizHDYQhBMpxdQsxt3q\nYNxOcXlRwgA/RWWAr6Ld+4tme3X8cT94b07KR7CkCM9olyGlVXUplFAczYONTz/h\nWdJ/llpk2lq+FtNzwOJ88Pv2jSAqufentinHHKUCgYEAjv/i1yBEH0/ZGPTGvzNT\nvKNs98scD9ZXawVKrQNeG9+VyGgn6R5vGCsawCF3QP3fn99SojVsqhJFDp3AE3Yh\nx5NsrFc7YPRHXDMfX5wPtVqDk/chIB/GSGrZtdAgGHWU53dqXogmn9s0vaZ9j1gx\nDbnuVKXdkVBrQOcE2yyaids=\n-----END PRIVATE KEY-----\n",
+  "client_email": "prueba01@streamlitasistencia.iam.gserviceaccount.com",
+  "client_id": "107510147050624656013",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/prueba01%40streamlitasistencia.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
