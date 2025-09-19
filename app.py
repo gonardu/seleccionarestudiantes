@@ -32,6 +32,7 @@ if not st.session_state.logged_in:
     username_input = st.text_input("Usuario")
     password_input = st.text_input("Contraseña", type="password")
     if st.button("Ingresar"):
+        # Aquí ponés tu validación de contraseña
         if username_input == "admin" and password_input == "1234":
             st.session_state.logged_in = True
             st.session_state.username = username_input
@@ -57,7 +58,21 @@ else:
             st.session_state.seleccionado = random.choice(new_alumnos)
 
     elegido = st.session_state.seleccionado or "ninguno"
-    st.markdown(f"**Estudiante elegido:** {elegido}")
+    # Recuadro del estudiante elegido
+    st.markdown(f"""
+        <div style='border: 2px solid #4CAF50; border-radius: 10px; padding: 20px; margin-top: 10px; background-color:#f0f0f0; text-align:center; font-size:20px;'>
+            Estudiante elegido: <strong>{elegido}</strong>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # ---------- Mostrar todos los alumnos en recuadros ----------
+    st.markdown("### 👩‍🎓 Lista de alumnos")
+    for est in new_alumnos:
+        st.markdown(f"""
+            <div style='border: 1px solid #888; border-radius: 5px; padding: 10px; margin: 5px; background-color:#ffffff;'>
+                {est}
+            </div>
+        """, unsafe_allow_html=True)
 
     # ---------- Guardar asistencia ----------
     def guardar_resultado(valor):
