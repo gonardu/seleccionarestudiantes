@@ -27,13 +27,15 @@ if "sheet_id" not in st.session_state:
 if "seleccionado" not in st.session_state:
     st.session_state.seleccionado = None
 if "ya_salieron" not in st.session_state:
-    st.session_state.ya_salieron = []  # historial de seleccionados
+    st.session_state.ya_salieron = []
+if "forgot_mode" not in st.session_state:
+    st.session_state.forgot_mode = False
 
 # ---------- LOGIN ----------
 st.title("🔒 Login")
 users = load_users()
 
-if not st.session_state.logged_in:
+if not st.session_state.logged_in and not st.session_state.forgot_mode:
     username_input = st.text_input("Usuario", key="login_user")
     password_input = st.text_input("Contraseña", type="password", key="login_pass")
     if st.button("Ingresar", key="login_button"):
@@ -47,6 +49,32 @@ if not st.session_state.logged_in:
                 st.error("Usuario o contraseña incorrectos ❌")
         else:
             st.error("Usuario o contraseña incorrectos ❌")
+
+    # Link para recuperar contraseña
+    if st.button("¿Olvidaste tu contraseña?"):
+        st.session_state.forgot_mode = True
+
+# ---------- CAMBIO DE CONTRASEÑA ----------
+if st.session_state.forgot_mode and not st.session_state.logged_in:
+    st.subheader("🔑 Recuperar contraseña")
+    recover_user = st.text_input("Usuario", key="recover_user")
+    new_pass = st.text_input("Nueva contraseña", type="password", key="recover_pass")
+
+    if st.button("Cambiar contraseña", key="reset_pass_button"):
+        if recover_user in users:
+            if new_pass.strip():
+                hashed_new = hashlib.sha256(new_pass.encode()).hexdigest()
+                users[recover_user]["password"] = hashed_new
+                save_users(users)
+                st.success("✅ Contraseña actualizada correctamente")
+                st.session_state.forgot_mode = False
+            else:
+                st.error("⚠️ Debes ingresar una nueva contraseña")
+        else:
+            st.error("⚠️ El usuario no existe")
+
+    if st.button("⬅️ Volver al login"):
+        st.session_state.forgot_mode = False
 
 # ---------- SESIÓN INICIADA ----------
 if st.session_state.logged_in:
