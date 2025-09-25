@@ -1,4 +1,4 @@
-import streamlit as st  
+import streamlit as st   
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
@@ -50,26 +50,32 @@ if not st.session_state.logged_in and not st.session_state.forgot_mode:
         else:
             st.error("Usuario o contraseña incorrectos ❌")
 
-    # Link para recuperar contraseña
-    if st.button("¿Olvidaste tu contraseña?"):
+    # Link para cambiar contraseña
+    if st.button("🔄 Cambiar contraseña"):
         st.session_state.forgot_mode = True
 
-# ---------- CAMBIO DE CONTRASEÑA ----------
+# ---------- CAMBIO DE CONTRASEÑA SEGURA ----------
 if st.session_state.forgot_mode and not st.session_state.logged_in:
-    st.subheader("🔑 Recuperar contraseña")
-    recover_user = st.text_input("Usuario", key="recover_user")
-    new_pass = st.text_input("Nueva contraseña", type="password", key="recover_pass")
+    st.subheader("🔑 Cambiar contraseña")
 
-    if st.button("Cambiar contraseña", key="reset_pass_button"):
-        if recover_user in users:
-            if new_pass.strip():
-                hashed_new = hashlib.sha256(new_pass.encode()).hexdigest()
-                users[recover_user]["password"] = hashed_new
-                save_users(users)
-                st.success("✅ Contraseña actualizada correctamente")
-                st.session_state.forgot_mode = False
+    username_cp = st.text_input("Usuario", key="cp_user")
+    old_pass = st.text_input("Contraseña actual", type="password", key="cp_old_pass")
+    new_pass = st.text_input("Nueva contraseña", type="password", key="cp_new_pass")
+
+    if st.button("Cambiar contraseña", key="cp_button"):
+        if username_cp in users:
+            hashed_old = hashlib.sha256(old_pass.encode()).hexdigest()
+            if hashed_old == users[username_cp]["password"]:
+                if new_pass.strip():
+                    hashed_new = hashlib.sha256(new_pass.encode()).hexdigest()
+                    users[username_cp]["password"] = hashed_new
+                    save_users(users)
+                    st.success("✅ Contraseña actualizada correctamente")
+                    st.session_state.forgot_mode = False
+                else:
+                    st.error("⚠️ Debes ingresar una nueva contraseña")
             else:
-                st.error("⚠️ Debes ingresar una nueva contraseña")
+                st.error("⚠️ Contraseña actual incorrecta")
         else:
             st.error("⚠️ El usuario no existe")
 
