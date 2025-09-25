@@ -26,6 +26,8 @@ if "sheet_id" not in st.session_state:
     st.session_state.sheet_id = None
 if "seleccionado" not in st.session_state:
     st.session_state.seleccionado = None
+if "ya_salieron" not in st.session_state:
+    st.session_state.ya_salieron = []  # historial de seleccionados
 
 # ---------- LOGIN ----------
 st.title("🔒 Login")
@@ -101,11 +103,26 @@ if st.session_state.logged_in:
             sheet.update("A2:A", [[a] for a in new_alumnos])
             st.success("Lista guardada ✅")
 
+        # ---------- Toggle repetir ----------
+        st.subheader("Opciones de selección")
+        repetir = st.toggle("Repetir", value=False)
+
         # ---------- Selección aleatoria ----------
         st.markdown("### 🎯 Selección de alumno")
         if st.button("Seleccionar alumno", key="select_random_button"):
             if new_alumnos:
-                st.session_state.seleccionado = random.choice(new_alumnos)
+                if repetir:
+                    elegido = random.choice(new_alumnos)
+                else:
+                    restantes = list(set(new_alumnos) - set(st.session_state.ya_salieron))
+                    if not restantes:
+                        st.error("🙌 Ya salieron todos los alumnos (sin repetición).")
+                        elegido = None
+                    else:
+                        elegido = random.choice(restantes)
+                        st.session_state.ya_salieron.append(elegido)
+
+                st.session_state.seleccionado = elegido
 
         elegido = st.session_state.seleccionado or "ninguno"
         st.markdown(f"""
